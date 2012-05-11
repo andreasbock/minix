@@ -29,7 +29,6 @@ set_internals(message *m_ptr)
 	return;
 }
 
-
 /* Returns pointer to the next free slot in the active buffer */
 void *
 get_next_slot(relevant_buffer)
