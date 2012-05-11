@@ -2,9 +2,9 @@
 */
 
 #include <minix/config.h>
-#include "ebprofile.h"
 #include "kernel.h"
 #include "proc.h"
+#include <stdio.h>
 
 #if EBPROFILE
 
@@ -12,37 +12,31 @@
 #define mutex_lock() (void)0
 #define mutex_unlock() (void)0
 
-/*
-void *get_active_buffer(void);
-int ebprofiling(void);
-int ebp_collect(message * m_user, struct proc *caller);
-int matches_bm(int m_type);
-*/
-
 void
 set_internals(message *m_ptr)
 {
-        ebp_bm  = m_ptr->EBP_BITMAP;
-        first   = m_ptr->EBP_BUFFER1;
-        second  = m_ptr->EBP_BUFFER2;
-        *relevant_buffer = 0;
+(void)fprintf(stdout,"Set internals1");
+        ebp_bm              = m_ptr->EBP_BITMAP;
+        ebp_first           = (ebp_sample_buffer*) m_ptr->EBP_BUFFER1;
+        ebp_second          = (ebp_sample_buffer*) m_ptr->EBP_BUFFER2;
+        ebp_relevant_buffer = (unsigned int*) m_ptr->EBP_RELBUF;
 	return;
 }
 
 /* Returns pointer to the next free slot in the active buffer */
-void *
-get_next_slot(relevant_buffer)
+kcall_sample
+get_next_slot()
 {
-        kcall_sample *free_sample;
-        if (relevant_buffer)
+        kcall_sample free_sample;
+        if (*ebp_relevant_buffer == 0)
         {
-                free_sample = first->sample[first->reached];
-                first->reached++;
+                free_sample = ebp_first->sample[ebp_first->reached];
+                ebp_first->reached++;
         }
         else
         {
-                free_sample = second->sample[second->reached];
-                second->reached++;
+                free_sample = ebp_second->sample[ebp_second->reached];
+                ebp_second->reached++;
         }
         return free_sample;
 }
@@ -59,11 +53,9 @@ int
 ebp_collect (message * m_user, struct proc *caller)
 {
   kcall_sample sample;
-  unsigned int relevant_buffer = m_user.EBP_RELBUF;
-  int m_type = m_user->m_type;
 
   mutex_lock();
-  sample = get_next_slot(relevant_buffer); 
+  sample = get_next_slot(); 
 
   /* Collect profiling data */ 	
   //sample.time		=
@@ -74,6 +66,7 @@ ebp_collect (message * m_user, struct proc *caller)
   //sample.cpu 		= caller->p_cpu;
   //sample.p_priority 	= caller->p_priority;
   //sample.p_priv 	= caller->p_priv;
+
   mutex_unlock();
   return 0;
 }
