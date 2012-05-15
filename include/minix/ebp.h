@@ -30,23 +30,22 @@ typedef struct
 
 typedef struct
 {
-  kcall_sample sample[BUFFER_SIZE];
+  key_t key;
   unsigned int reached;
   int lock;
+  kcall_sample sample[BUFFER_SIZE];
 } ebp_sample_buffer;
 
 typedef struct
 {
   ebp_sample_buffer *first;
-  key_t first_key;
   ebp_sample_buffer *second;
-  key_t second_key;
 } ebp_buffers;
 
 ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (ebp_sample_buffer *buffer);
-key_t alloc_buffers (void);
+key_t *alloc_buffers (void);
 
 #endif /* EBPROFILE */
 #endif /* _LIB_EBPROF_H */

@@ -23,25 +23,19 @@ ebp_buffers *buffers;
 ebp_buffers *
 ebp_start (int bitmap)
 {
-  (void)fprintf(stdout,"LIB start1\n");
   message m;
-  (void)fprintf(stdout,"LIB start101\n");
   buffers = malloc(sizeof(ebp_buffers));
-  (void)fprintf(stdout,"LIB start11\n");
-  buffers->first_key = alloc_buffers();
-  (void)fprintf(stdout,"LIB start12\n");
-  buffers->second_key = alloc_buffers();
-  (void)fprintf(stdout,"LIB start13\n");
+  buffers->first  = alloc_buffers();
+  buffers->second = alloc_buffers();
   relevant_buffer = malloc(sizeof(int));
-  (void)fprintf(stdout,"LIB start2\n");
 
   /* Set profiling flag */
   bitmap &= 0x1;
  
   (void)fprintf(stdout,"LIB start3\n");
   /* do syscall */ 
-  m.EBP_BUFFER1_KEY	= buffers->first_key;
-  m.EBP_BUFFER2_KEY	= buffers->second_key;
+  m.EBP_BUFFER1_KEY	= buffers->first->key;
+  m.EBP_BUFFER2_KEY	= buffers->second->key;
   m.EBP_RELBUF          = relevant_buffer;
   m.EBP_BITMAP	        = bitmap;
 
@@ -98,32 +92,33 @@ ebp_get (ebp_sample_buffer *buffer)
 }
 
 /* Allocates memory for double buffering */
-key_t
+ebp_sample_buffer *
 alloc_buffers (void)
 {
   int shmid;
   ebp_sample_buffer *shm, *s;
-  key_t key = 1234;
+  key_t *key;
   fprintf(stdout,"allocB start\n");
 
+  *key = 1234;
   /* Create segment */
   if ((shmid = shmget(key, sizeof(ebp_sample_buffer), IPC_CREAT | 0666)) < 0) {
-          perror("shmget");
+          perror("Could not get shared memory segment");
           exit(1);
   }
 
-  /* Now we attach the segment to our data space. */
+  /* Attach the segment to our address space. */
   if ((shm = shmat(shmid, NULL, 0)) == -1) {
-          perror("shmat");
+          perror("Could not attach shared memory segment.");
           exit(1);
   }
   else
   {
-          memset (shm, '\0', sizeof (ebp_sample_buffer));
+          shm->key = key;
           shm->lock = 0;
           shm->reached = 0;
+          memset (shm+3, '\0', sizeof (ebp_sample_buffer));
   }
-
   fprintf(stdout,"allocB start3\n");
   return shm;
 }
