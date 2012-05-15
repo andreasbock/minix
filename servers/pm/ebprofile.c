@@ -21,6 +21,7 @@ PUBLIC int do_ebprofile(void)
 {
 #if EBPROFILE
         int shmid1, shmid2;
+        int *shm1, shm2;
         if ((shmid1 = shmget(m_in.EBP_BUFFER1_KEY, sizeof(ebp_sample_buffer), 0666)) < 0) {
                  perror("shmget fail buffer1");
                  exit(1);
