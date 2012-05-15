@@ -11,7 +11,7 @@
 #include <signal.h>
 #include "mproc.h"
 #include "param.h"
-#include <sys/ipc.h>
+#include <sys/shm.h>
 #include <minix/ebp.h>
 
 /*===========================================================================*

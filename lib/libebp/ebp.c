@@ -8,7 +8,7 @@
 #include <minix/ebp.h>
 #include <minix/syslib.h>
 #include <minix/callnr.h>
-#include <sys/ipc.h>
+#include <sys/shm.h>
 
 #if EBPROFILE
 
