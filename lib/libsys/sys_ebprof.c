@@ -11,10 +11,10 @@ unsigned int *relevant_buffer;
 {
         message m;
 
-	m.EBP_BUFFER1 	= buffer1;
-	m.EBP_BUFFER2 	= buffer2;
-	m.EBP_RELBUF	= relevant_buffer;
-	m.EBP_BITMAP	= ebp_pm;
+	m.EBP_BUFFER1_KEY 	= buffer1;
+	m.EBP_BUFFER2_KEY 	= buffer2;
+	m.EBP_RELBUF	        = relevant_buffer;
+	m.EBP_BITMAP	        = ebp_pm;
 
         return(_kernel_call(SYS_EBPROF, &m));
 }

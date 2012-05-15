@@ -17,8 +17,8 @@ set_internals(message *m_ptr)
 {
 (void)fprintf(stdout,"Set internals1");
         ebp_bm              = m_ptr->EBP_BITMAP;
-        ebp_first           = (ebp_sample_buffer*) m_ptr->EBP_BUFFER1;
-        ebp_second          = (ebp_sample_buffer*) m_ptr->EBP_BUFFER2;
+        ebp_first           = (ebp_sample_buffer*) m_ptr->EBP_BUFFER1_KEY;
+        ebp_second          = (ebp_sample_buffer*) m_ptr->EBP_BUFFER2_KEY;
         ebp_relevant_buffer = (unsigned int*) m_ptr->EBP_RELBUF;
 	return;
 }

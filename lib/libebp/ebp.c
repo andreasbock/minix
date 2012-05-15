@@ -8,6 +8,7 @@
 #include <minix/ebp.h>
 #include <minix/syslib.h>
 #include <minix/callnr.h>
+#include <sys/ipc.h>
 
 #if EBPROFILE
 
@@ -27,9 +28,9 @@ ebp_start (int bitmap)
   (void)fprintf(stdout,"LIB start101\n");
   buffers = malloc(sizeof(ebp_buffers));
   (void)fprintf(stdout,"LIB start11\n");
-  buffers->first = alloc_buffers();
+  buffers->first_key = alloc_buffers();
   (void)fprintf(stdout,"LIB start12\n");
-  buffers->second = alloc_buffers();
+  buffers->second_key = alloc_buffers();
   (void)fprintf(stdout,"LIB start13\n");
   relevant_buffer = malloc(sizeof(int));
   (void)fprintf(stdout,"LIB start2\n");
@@ -39,10 +40,10 @@ ebp_start (int bitmap)
  
   (void)fprintf(stdout,"LIB start3\n");
   /* do syscall */ 
-  m.EBP_BUFFER1	= buffers->first;
-  m.EBP_BUFFER2	= buffers->second;
-  m.EBP_RELBUF  = relevant_buffer;
-  m.EBP_BITMAP	= bitmap;
+  m.EBP_BUFFER1_KEY	= buffers->first_key;
+  m.EBP_BUFFER2_KEY	= buffers->second_key;
+  m.EBP_RELBUF          = relevant_buffer;
+  m.EBP_BITMAP	        = bitmap;
 
   (void)fprintf(stdout,"LIB start4\n");
   _syscall(PM_PROC_NR, EBPROF, &m);
@@ -55,10 +56,10 @@ void
 ebp_stop (void)
 {
   message m;
-  m.EBP_BUFFER1	= NULL;
-  m.EBP_BUFFER2	= NULL;
-  m.EBP_BITMAP	= 0x0;
-  m.EBP_RELBUF	= 0x0;
+  m.EBP_BUFFER1_KEY	= NULL;
+  m.EBP_BUFFER2_KEY	= NULL;
+  m.EBP_BITMAP	        = 0x0;
+  m.EBP_RELBUF	        = NULL;
   free(buffers->first);
   free(buffers->second);
   free(relevant_buffer);
@@ -97,25 +98,34 @@ ebp_get (ebp_sample_buffer *buffer)
 }
 
 /* Allocates memory for double buffering */
-ebp_sample_buffer *
+key_t
 alloc_buffers (void)
 {
+  int shmid;
+  ebp_sample_buffer *shm, *s;
+  key_t key = 1234;
   fprintf(stdout,"allocB start\n");
-  ebp_sample_buffer *buffer;
-  buffer = malloc (sizeof (ebp_sample_buffer));
-  fprintf(stdout,"allocB start2\n");
-  if (buffer == NULL)
-    {
-      printf("Could not allocate buffers. Disabling event-based profiling.\n");
-    }
+
+  /* Create segment */
+  if ((shmid = shmget(key, sizeof(ebp_sample_buffer), IPC_CREAT | 0666)) < 0) {
+          perror("shmget");
+          exit(1);
+  }
+
+  /* Now we attach the segment to our data space. */
+  if ((shm = shmat(shmid, NULL, 0)) == -1) {
+          perror("shmat");
+          exit(1);
+  }
   else
-    {
-     memset (buffer, '\0', sizeof (ebp_sample_buffer));
-     buffer->lock = 0;
-     buffer->reached = 0;
-    }
+  {
+          memset (shm, '\0', sizeof (ebp_sample_buffer));
+          shm->lock = 0;
+          shm->reached = 0;
+  }
+
   fprintf(stdout,"allocB start3\n");
-  return buffer;
+  return shm;
 }
 
 #endif /* EBPROFILE */

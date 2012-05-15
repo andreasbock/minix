@@ -2,8 +2,8 @@
 #define _LIB_EBPROF_H
 
 /* This header file defines types and structures
-*  for the ebprofile tool.
-*/
+ *  for the ebprofile tool.
+ */
 
 #include <minix/ipc.h>
 #include <minix/com.h>
@@ -38,14 +38,15 @@ typedef struct
 typedef struct
 {
   ebp_sample_buffer *first;
+  key_t first_key;
   ebp_sample_buffer *second;
+  key_t second_key;
 } ebp_buffers;
 
-/* userland functions */
 ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (ebp_sample_buffer *buffer);
-ebp_sample_buffer *alloc_buffers (void);
+key_t alloc_buffers (void);
 
 #endif /* EBPROFILE */
 #endif /* _LIB_EBPROF_H */
