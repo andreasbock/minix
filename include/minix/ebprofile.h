@@ -21,7 +21,7 @@
 #define LFILE  1
 #define NETW   2
 
-#define BUFFER_SIZE 1024 // has to match with kernel/ebprofile.h
+#define BUFFER_SIZE 1024
 
 typedef struct
 {
@@ -36,13 +36,13 @@ typedef struct
 {
   ebp_m_sample sample[BUFFER_SIZE];
   unsigned int reached;
-  mthread_rwlock_t lock;
+  int checkpoint;
 } ebp_sample_buffer;
 
 typedef struct
 {
   unsigned int relbuf;
-  mthread_rwlock_t lock;
+  int checkpoint;
 } ebp_buffer_indicator;
 
 typedef struct
@@ -64,7 +64,7 @@ int ebp_get (ebp_sample_buffer *buffer);
 void alloc_buffers (void);
 
 /* serverspace functions */
-void handle_ebpctl();
+int handle_ebpctl(message *m);
 void server_probe(message *m);
 
 #endif /* _TOOL_EBPROF_H */

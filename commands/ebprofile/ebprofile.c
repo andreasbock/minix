@@ -66,6 +66,11 @@ start ()
   {
 	reached = ebp_get(&consumer_buffer);
         if (reached == 0) continue;
+        if (reached >= BUFFER_SIZE) 
+        {
+          printf("We are losing data! Not consuming fast enough. Lost %d samples.\n",reached-BUFFER_SIZE+1);
+          reached = BUFFER_SIZE-1;
+        }
 
 	for (i=0; i< reached; i++)
 	{
@@ -84,7 +89,7 @@ start ()
 // TODO pkill process, if exists. probably needs to report back to user what happened
 int
 stop () {
-  printf("Stopping");
+  printf("Stopping\n");
   ebp_stop();
   //sigaction(SIGKILL); // Read docs, noobz
   return 0;
