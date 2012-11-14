@@ -88,7 +88,6 @@ _deps:=		${_deps} ${_prev:S/^/install-/}
 .if !make(all) && !make(dependall) && !make(install)
 install-${_prev}: dependall-${_prev}
 .endif
-
 .else # ${_this} != ".WAIT"			# } {
 
 # order depend/all/install targets for ${d} subdir.

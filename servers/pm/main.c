@@ -14,6 +14,7 @@
 #include <minix/callnr.h>
 #include <minix/com.h>
 #include <minix/ds.h>
+#include <minix/rs.h>
 #include <minix/type.h>
 #include <minix/endpoint.h>
 #include <minix/minlib.h>
@@ -30,6 +31,8 @@
 #include <env.h>
 #include "mproc.h"
 #include "param.h"
+
+#include <minix/ebprofile.h>
 
 #include "kernel/const.h"
 #include "kernel/config.h"
@@ -51,6 +54,7 @@ static void sef_local_startup(void);
 static int sef_cb_init_fresh(int type, sef_init_info_t *info);
 static int sef_cb_signal_manager(endpoint_t target, int signo);
 
+
 /*===========================================================================*
  *				main					     *
  *===========================================================================*/
@@ -58,7 +62,7 @@ int main()
 {
 /* Main routine of the process manager. */
   int result;
-
+  
   /* SEF local startup. */
   sef_local_startup();
 
@@ -101,7 +105,12 @@ int main()
 
 	switch(call_nr)
 	{
-	case PM_SETUID_REPLY:
+#if EBPROFILE
+        case PROS_SERVER_CTL:
+                result = handle_ebpctl(&m_in);
+                break;
+#endif
+        case PM_SETUID_REPLY:
 	case PM_SETGID_REPLY:
 	case PM_SETSID_REPLY:
 	case PM_EXEC_REPLY:
@@ -133,6 +142,9 @@ int main()
 #if ENABLE_SYSCALL_STATS
 			calls_stats[call_nr]++;
 #endif
+#if EBPROFILE
+    			server_probe(&m_in);
+#endif
 
 			result = (*call_vec[call_nr])();
 
@@ -143,6 +155,7 @@ int main()
 	/* Send reply. */
 	if (result != SUSPEND) setreply(who_p, result);
 	sendreply();
+       
   }
   return(OK);
 }

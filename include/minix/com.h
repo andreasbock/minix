@@ -1293,4 +1293,27 @@
 #  define BDEV_NOFLAGS		0x00	/* no flags are set */
 #  define BDEV_FORCEWRITE	0x01	/* force write to disk immediately */
 
+/*===========================================================================*
+ *			Messages for profiling  			     *
+ *===========================================================================*/
+
+#define PROS_BASE       0x1600 
+
+#define PROS_CTL	(PROS_BASE + 0)	/* control profiling */
+#define PROS_PROBE	(PROS_BASE + 1)	/* fire probe for profiling */
+#define PROS_SERVER_CTL (PROS_BASE + 2) /* control profiling in servers */
+
+/* Field names for controlling profiling */
+#define PROS_BUFFER1	m7_i1	
+#define PROS_BUFFER2	m7_i2	
+#define PROS_RELBUF	m7_i3	
+#define PROS_BITMAP	m7_i4	
+
+/* Field names for probe */
+#define PROS_TYPE 	m7_i1
+#define PROS_PAYLOAD 	m7_i2
+
+/* Field names for controlling profiling in servers */
+#define PROS_SERV_BMAP 	m7_i1
+
 /* _MINIX_COM_H */
