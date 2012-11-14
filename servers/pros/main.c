@@ -27,12 +27,14 @@ int do_ctl (message *m_ptr);
 int attach_memory (key_t key1, key_t key2, key_t key3);
 
 /* SEF functions and variables. */
-FORWARD _PROTOTYPE( void sef_local_startup, (void) );
+/*FORWARD _PROTOTYPE( void sef_local_startup, (void) );*/
+static void sef_local_startup(void);
 
 /*===========================================================================*
  *				main                                         *
  *===========================================================================*/
-PUBLIC int main(int argc, char **argv)
+/*PUBLIC int main(int argc, char **argv)*/
+int main(int argc, char **argv)
 {
 /* This is the main routine of this service. The main loop consists of 
  * three major activities: getting new work, processing the work, and
@@ -143,7 +145,8 @@ void write_buffer(
 /*===========================================================================*
  *			       sef_local_startup			     *
  *===========================================================================*/
-PRIVATE void sef_local_startup()
+/*PRIVATE void sef_local_startup()*/
+void sef_local_startup()
 {
   /* Register init callbacks. */
 
